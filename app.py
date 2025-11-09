@@ -118,12 +118,28 @@ def calc_payout(legs, odds=-180):
     return {'legs': legs, 'avg_odds_per_leg': odds, 'decimal': total, 'american': american,
             'payout_per_100': total * 100, 'profit_per_100': (total - 1) * 100}
 
+def create_hedges(parlay):
+    if len(parlay) < 6: return []
+    by_risk = sorted(parlay, key=lambda x: x['cushion_pct'])
+    hedges = []
+    for i in range(3):
+        removed = by_risk[i]
+        hedge_legs = [p for p in parlay if p != removed]
+        hedges.append({
+            'name': f"Hedge {i+1}",
+            'removed': f"{removed['player_name']} {removed['stat_type']}",
+            'legs': hedge_legs,
+            'payout': calc_payout(len(hedge_legs))
+        })
+    return hedges
+
 @app.route('/')
 def index():
     props = calc_cushion(PROPS_DATA)
     parlay = build_parlay(props)
     payout = calc_payout(len(parlay))
-    return render_template_string(HTML, props=props, total_props=len(props), parlay=parlay, payout=payout)
+    hedges = create_hedges(parlay)
+    return render_template_string(HTML, props=props, total_props=len(props), parlay=parlay, payout=payout, hedges=hedges)
 
 @app.route('/api')
 def api():
