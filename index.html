@@ -431,6 +431,39 @@
         };
         
         const SCENARIOS = {
+            safePlay: {
+                title: "Conservative Cushion",
+                subtitle: "Bet Under Season Averages",
+                icon: "🎯",
+                description: "Pure math play. Every prop line is BELOW season average. Highest probability 6-leg parlay.",
+                legs: ['herbert-pass', 'johnston-rec', 'vidal-rush', 'rodgers-comp', 'metcalf-rec', 'warren-rush'],
+                hedges: [
+                    {
+                        title: "If Top Players Underperform",
+                        logic: "Stars get doubled. Secondary options become primary targets.",
+                        swaps: [
+                            {out: 'johnston-rec', in: 'mcconkey-rec'},
+                            {out: 'metcalf-rec', in: 'gadsden-rec'}
+                        ]
+                    },
+                    {
+                        title: "If Game Gets Pass-Heavy",
+                        logic: "One team falls behind early. Rushing props miss, passing increases.",
+                        swaps: [
+                            {out: 'vidal-rush', in: 'herbert-comp'},
+                            {out: 'warren-rush', in: 'rodgers-pass'}
+                        ]
+                    },
+                    {
+                        title: "If Run Game Dominates",
+                        logic: "Both teams establish run early. Less passing volume than expected.",
+                        swaps: [
+                            {out: 'herbert-pass', in: 'mcconkey-catch'},
+                            {out: 'rodgers-comp', in: 'warren-rec'}
+                        ]
+                    }
+                ]
+            },
             passHeavy: {
                 title: "Chargers Dominate",
                 subtitle: "Pass-Heavy Blowout",
