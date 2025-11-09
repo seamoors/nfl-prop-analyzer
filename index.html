@@ -3,335 +3,348 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NFL Prop Parlay Builder Pro</title>
+    <title>NFL Smart Parlay Builder - Game Script Engine</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
             min-height: 100vh;
             padding: 20px;
+            color: #fff;
         }
         
         .container {
             max-width: 1600px;
             margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
         }
         
         .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 30px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .header h1 { font-size: 2em; }
-        
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 0;
-            min-height: 80vh;
-        }
-        
-        .left-panel {
-            padding: 30px;
-            border-right: 2px solid #e9ecef;
-        }
-        
-        .right-panel {
-            padding: 30px;
-            background: #f8f9fa;
-            position: sticky;
-            top: 0;
-            max-height: 100vh;
-            overflow-y: auto;
-        }
-        
-        .game-selector {
-            margin-bottom: 30px;
-        }
-        
-        .game-tabs {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-        
-        .game-tab {
-            padding: 12px 20px;
-            border: 2px solid #dee2e6;
-            border-radius: 10px;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-        
-        .game-tab:hover {
-            border-color: #667eea;
-            transform: translateY(-2px);
-        }
-        
-        .game-tab.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-color: #667eea;
-        }
-        
-        .filters {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .filter-btn {
-            padding: 8px 16px;
-            border: 2px solid #dee2e6;
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255,255,255,0.05);
             border-radius: 20px;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.9em;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
         }
         
-        .filter-btn.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
-        .props-grid {
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .game-info {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .game-info h2 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+        
+        .scenarios-grid {
             display: grid;
-            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
         }
         
-        .prop-card {
-            background: white;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            padding: 16px;
+        .scenario-card {
+            background: rgba(255,255,255,0.08);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 25px;
             cursor: pointer;
             transition: all 0.3s;
-            position: relative;
+            backdrop-filter: blur(10px);
         }
         
-        .prop-card:hover {
+        .scenario-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        .scenario-card.selected {
             border-color: #667eea;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-            transform: translateY(-2px);
+            background: rgba(102, 126, 234, 0.2);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
         }
         
-        .prop-card.selected {
-            border-color: #28a745;
-            background: #d4edda;
-        }
-        
-        .prop-card.suggested {
-            border-color: #ffc107;
-            background: #fff3cd;
-        }
-        
-        .prop-header {
+        .scenario-header {
             display: flex;
             justify-content: space-between;
             align-items: start;
-            margin-bottom: 8px;
+            margin-bottom: 15px;
         }
         
-        .player-name {
-            font-weight: 700;
+        .scenario-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .scenario-icon {
+            font-size: 2em;
+        }
+        
+        .scenario-desc {
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 15px;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+        
+        .scenario-legs {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .leg-item {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9em;
+        }
+        
+        .leg-item:last-child {
+            border-bottom: none;
+        }
+        
+        .payout-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-align: center;
+            font-weight: bold;
             font-size: 1.1em;
-            color: #2a5298;
         }
         
-        .confidence-badge {
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.75em;
-            font-weight: 600;
-            text-transform: uppercase;
+        .hedges-section {
+            display: none;
+            margin-top: 40px;
         }
         
-        .conf-very-high { background: #d4edda; color: #155724; }
-        .conf-high { background: #d1ecf1; color: #0c5460; }
-        .conf-medium { background: #fff3cd; color: #856404; }
-        .conf-low { background: #f8d7da; color: #721c24; }
-        
-        .prop-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid #dee2e6;
-        }
-        
-        .prop-stat {
-            font-size: 0.85em;
-            color: #6c757d;
-        }
-        
-        .prop-stat strong {
-            color: #333;
+        .hedges-section.active {
             display: block;
         }
         
-        .my-parlay {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .section-header {
+            background: rgba(255,255,255,0.08);
             padding: 20px;
             border-radius: 15px;
             margin-bottom: 20px;
+            text-align: center;
         }
         
-        .my-parlay h3 {
-            margin-bottom: 15px;
-            font-size: 1.3em;
+        .section-header h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .main-parlay {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+            border: 2px solid #667eea;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .parlay-title {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .parlay-legs {
-            margin-bottom: 15px;
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
         }
         
         .parlay-leg {
-            background: rgba(255,255,255,0.15);
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            font-size: 0.9em;
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            border-radius: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         
-        .remove-btn {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-weight: bold;
+        .leg-info strong {
+            color: #667eea;
         }
         
-        .remove-btn:hover {
-            background: rgba(255,0,0,0.5);
+        .leg-cushion {
+            font-size: 0.85em;
+            color: rgba(255,255,255,0.7);
         }
+        
+        .confidence {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        
+        .conf-high { background: #d4edda; color: #155724; }
+        .conf-medium { background: #fff3cd; color: #856404; }
+        .conf-low { background: #f8d7da; color: #721c24; }
         
         .payout-calc {
-            background: rgba(255,255,255,0.2);
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
         }
         
-        .payout-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 8px 0;
+        .payout-item {
+            text-align: center;
         }
         
-        .payout-big {
-            font-size: 1.4em;
+        .payout-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        
+        .payout-value {
+            font-size: 1.5em;
             font-weight: bold;
             color: #ffd700;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 2px solid rgba(255,255,255,0.3);
         }
         
-        .action-buttons {
+        .hedges-grid {
             display: grid;
-            gap: 10px;
-            margin-top: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .hedge-card {
+            background: rgba(255,255,255,0.08);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .hedge-header {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        
+        .hedge-title {
+            font-size: 1.4em;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        
+        .hedge-logic {
+            background: rgba(255, 193, 7, 0.2);
+            border-left: 3px solid #ffc107;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+        
+        .hedge-logic strong {
+            color: #ffc107;
+        }
+        
+        .changes-list {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .change-item {
+            padding: 8px 0;
+            font-size: 0.9em;
+        }
+        
+        .change-out {
+            color: #ff6b6b;
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        
+        .change-in {
+            color: #51cf66;
+            font-weight: 600;
         }
         
         .btn {
-            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             border: none;
-            border-radius: 8px;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-        }
-        
-        .btn-primary {
-            background: #28a745;
-            color: white;
-        }
-        
-        .btn-secondary {
-            background: rgba(255,255,255,0.3);
-            color: white;
+            width: 100%;
+            margin-top: 10px;
         }
         
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
         }
         
-        .suggestions {
-            background: #fff3cd;
-            border: 2px solid #ffc107;
-            padding: 15px;
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .tip-box {
+            background: rgba(102, 126, 234, 0.2);
+            border-left: 4px solid #667eea;
+            padding: 20px;
             border-radius: 10px;
-            margin-bottom: 20px;
+            margin-top: 30px;
         }
         
-        .suggestions h4 {
-            color: #856404;
+        .tip-box h3 {
+            color: #667eea;
             margin-bottom: 10px;
         }
         
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #6c757d;
-        }
-        
-        .stats-bar {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-        }
-        
-        .stat-item {
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #2a5298;
-        }
-        
-        .stat-label {
-            font-size: 0.85em;
-            color: #6c757d;
-        }
-        
-        @media (max-width: 1200px) {
-            .main-content {
+        @media (max-width: 768px) {
+            .scenarios-grid,
+            .hedges-grid {
                 grid-template-columns: 1fr;
-            }
-            
-            .right-panel {
-                position: relative;
-                max-height: none;
             }
         }
     </style>
@@ -339,259 +352,371 @@
 <body>
     <div class="container">
         <div class="header">
-            <div>
-                <h1>🏈 NFL Prop Parlay Builder Pro</h1>
-                <p>Build custom parlays with AI-powered suggestions</p>
-            </div>
-            <div id="timestamp"></div>
+            <h1>🧠 NFL Smart Parlay Builder</h1>
+            <p>Game Script Engine with Intelligent Hedging</p>
         </div>
         
-        <div class="main-content">
-            <div class="left-panel">
-                <div class="game-selector">
-                    <h2 style="margin-bottom: 15px;">Select Game</h2>
-                    <div class="game-tabs" id="gameTabs"></div>
+        <div class="game-info">
+            <h2>Pittsburgh Steelers @ Los Angeles Chargers</h2>
+            <p>Monday Night Football • 8:20 PM ET</p>
+        </div>
+        
+        <div class="section-header">
+            <h2>📊 Step 1: Choose Your Game Script</h2>
+            <p>Pick the scenario you think is most likely to happen</p>
+        </div>
+        
+        <div class="scenarios-grid" id="scenariosGrid"></div>
+        
+        <div class="hedges-section" id="hedgesSection">
+            <div class="main-parlay">
+                <div class="parlay-title">
+                    <span>🎯</span>
+                    <span id="mainScenarioTitle">Your Main Parlay</span>
                 </div>
-                
-                <div class="stats-bar">
-                    <div class="stat-item">
-                        <div class="stat-value" id="totalProps">0</div>
-                        <div class="stat-label">Available Props</div>
+                <div class="parlay-legs" id="mainParlayLegs"></div>
+                <div class="payout-calc">
+                    <div class="payout-item">
+                        <div class="payout-label">Legs</div>
+                        <div class="payout-value" id="mainLegs">6</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="suggestedCount">0</div>
-                        <div class="stat-label">AI Suggested</div>
+                    <div class="payout-item">
+                        <div class="payout-label">Odds</div>
+                        <div class="payout-value" id="mainOdds">+659</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="selectedCount">0</div>
-                        <div class="stat-label">In Your Parlay</div>
+                    <div class="payout-item">
+                        <div class="payout-label">$100 Pays</div>
+                        <div class="payout-value" id="mainPayout">$759</div>
                     </div>
                 </div>
-                
-                <div class="filters">
-                    <button class="filter-btn active" onclick="filterProps('all')">All Props</button>
-                    <button class="filter-btn" onclick="filterProps('suggested')">AI Suggested</button>
-                    <button class="filter-btn" onclick="filterProps('passing')">Passing</button>
-                    <button class="filter-btn" onclick="filterProps('rushing')">Rushing</button>
-                    <button class="filter-btn" onclick="filterProps('receiving')">Receiving</button>
-                </div>
-                
-                <div id="suggestions" class="suggestions" style="display: none;">
-                    <h4>💡 AI Recommendation</h4>
-                    <p id="suggestionText"></p>
-                    <button class="btn btn-primary" style="margin-top: 10px; width: 100%;" onclick="addSuggestedProps()">
-                        Add All Suggested Props
-                    </button>
-                </div>
-                
-                <div class="props-grid" id="propsGrid"></div>
             </div>
             
-            <div class="right-panel">
-                <div class="my-parlay">
-                    <h3>🎫 My Parlay (<span id="legCount">0</span> legs)</h3>
-                    <div class="parlay-legs" id="parlayLegs">
-                        <div class="empty-state" style="color: rgba(255,255,255,0.7);">
-                            Click props to add them here
-                        </div>
-                    </div>
-                    
-                    <div class="payout-calc" id="payoutCalc" style="display: none;">
-                        <div class="payout-row">
-                            <span>Odds per leg:</span>
-                            <span id="oddsPerLeg">-180</span>
-                        </div>
-                        <div class="payout-row">
-                            <span>Combined odds:</span>
-                            <span id="combinedOdds">+0</span>
-                        </div>
-                        <div class="payout-row">
-                            <span>Multiplier:</span>
-                            <span id="multiplier">0.00x</span>
-                        </div>
-                        <div class="payout-big">
-                            $100 → $<span id="payout100">100</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="action-buttons">
-                    <button class="btn btn-primary" onclick="generateHedges()">
-                        🛡️ Generate 3 Hedge Versions
-                    </button>
-                    <button class="btn btn-secondary" onclick="clearParlay()">
-                        🗑️ Clear Parlay
-                    </button>
-                    <button class="btn btn-secondary" onclick="exportParlay()">
-                        📥 Export to CSV
-                    </button>
-                </div>
-                
-                <div id="hedges" style="margin-top: 20px;"></div>
+            <div class="section-header">
+                <h2>🛡️ Step 2: Smart Hedge Suggestions</h2>
+                <p>These alternative parlays protect you if your main scenario doesn't play out</p>
+            </div>
+            
+            <div class="hedges-grid" id="hedgesGrid"></div>
+            
+            <div class="tip-box">
+                <h3>💡 Betting Strategy</h3>
+                <p><strong>Portfolio Approach:</strong> Bet $25 on main + $20 on each hedge = $85 total risk</p>
+                <p><strong>If main hits:</strong> $759 payout - $85 cost = $674 profit (7.9x ROI)</p>
+                <p><strong>If hedge hits:</strong> $500-600 payout - $85 cost = $415-515 profit (4.9-6x ROI)</p>
+                <p style="margin-top:10px; opacity:0.8;">This strategy gives you coverage across multiple game scripts while maintaining strong profit potential.</p>
+            </div>
+            
+            <div class="actions">
+                <button class="btn" onclick="exportAllParlays()">📥 Export All 4 Parlays to CSV</button>
+                <button class="btn btn-secondary" onclick="resetSelection()">🔄 Choose Different Scenario</button>
             </div>
         </div>
     </div>
     
     <script>
-        // NFL Games Data
-        const games = {
-            'pit-lac': {
-                name: 'Steelers @ Chargers',
-                time: 'Mon 8:20 PM ET',
-                props: [
-                    {id: 1, player: 'Justin Herbert', team: 'LAC', stat: 'Passing Yards', line: 259.5, avg: 265.6},
-                    {id: 2, player: 'Justin Herbert', team: 'LAC', stat: 'Pass Completions', line: 24.5, avg: 27.1},
-                    {id: 3, player: 'Ladd McConkey', team: 'LAC', stat: 'Receiving Yards', line: 56.5, avg: 58.2},
-                    {id: 4, player: 'Ladd McConkey', team: 'LAC', stat: 'Receptions', line: 4.5, avg: 5.2},
-                    {id: 5, player: 'Quentin Johnston', team: 'LAC', stat: 'Receiving Yards', line: 52.5, avg: 65.7},
-                    {id: 6, player: 'Kimani Vidal', team: 'LAC', stat: 'Rushing Yards', line: 42.5, avg: 51.8},
-                    {id: 7, player: 'Aaron Rodgers', team: 'PIT', stat: 'Passing Yards', line: 215.5, avg: 211.5},
-                    {id: 8, player: 'Aaron Rodgers', team: 'PIT', stat: 'Pass Completions', line: 20.5, avg: 23.2},
-                    {id: 9, player: 'DK Metcalf', team: 'PIT', stat: 'Receiving Yards', line: 49.5, avg: 58.4},
-                    {id: 10, player: 'DK Metcalf', team: 'PIT', stat: 'Receptions', line: 3.5, avg: 3.6},
-                    {id: 11, player: 'Jaylen Warren', team: 'PIT', stat: 'Rushing Yards', line: 48.5, avg: 57.7},
-                    {id: 12, player: 'Jaylen Warren', team: 'PIT', stat: 'Receiving Yards', line: 22.5, avg: 27.6},
-                    {id: 13, player: 'Oronde Gadsden II', team: 'PIT', stat: 'Receiving Yards', line: 52.5, avg: 58.0}
+        const PROPS = {
+            'herbert-pass': {player: 'Justin Herbert', team: 'LAC', stat: 'Passing Yards', line: 259.5, avg: 265.6, type: 'passing'},
+            'herbert-comp': {player: 'Justin Herbert', team: 'LAC', stat: 'Completions', line: 24.5, avg: 27.1, type: 'passing'},
+            'mcconkey-rec': {player: 'Ladd McConkey', team: 'LAC', stat: 'Receiving Yards', line: 56.5, avg: 58.2, type: 'receiving'},
+            'mcconkey-catch': {player: 'Ladd McConkey', team: 'LAC', stat: 'Receptions', line: 4.5, avg: 5.2, type: 'receiving'},
+            'johnston-rec': {player: 'Quentin Johnston', team: 'LAC', stat: 'Receiving Yards', line: 52.5, avg: 65.7, type: 'receiving'},
+            'vidal-rush': {player: 'Kimani Vidal', team: 'LAC', stat: 'Rushing Yards', line: 42.5, avg: 51.8, type: 'rushing'},
+            'rodgers-pass': {player: 'Aaron Rodgers', team: 'PIT', stat: 'Passing Yards', line: 215.5, avg: 211.5, type: 'passing'},
+            'rodgers-comp': {player: 'Aaron Rodgers', team: 'PIT', stat: 'Completions', line: 20.5, avg: 23.2, type: 'passing'},
+            'metcalf-rec': {player: 'DK Metcalf', team: 'PIT', stat: 'Receiving Yards', line: 49.5, avg: 58.4, type: 'receiving'},
+            'metcalf-catch': {player: 'DK Metcalf', team: 'PIT', stat: 'Receptions', line: 3.5, avg: 3.6, type: 'receiving'},
+            'warren-rush': {player: 'Jaylen Warren', team: 'PIT', stat: 'Rushing Yards', line: 48.5, avg: 57.7, type: 'rushing'},
+            'warren-rec': {player: 'Jaylen Warren', team: 'PIT', stat: 'Receiving Yards', line: 22.5, avg: 27.6, type: 'receiving'},
+            'gadsden-rec': {player: 'Oronde Gadsden II', team: 'PIT', stat: 'Receiving Yards', line: 52.5, avg: 58.0, type: 'receiving'}
+        };
+        
+        const SCENARIOS = {
+            passHeavy: {
+                title: "Chargers Dominate",
+                subtitle: "Pass-Heavy Blowout",
+                icon: "🚀",
+                description: "Chargers jump ahead early and Herbert throws all game. Steelers playing catch-up unsuccessfully.",
+                legs: ['herbert-pass', 'herbert-comp', 'mcconkey-rec', 'johnston-rec', 'metcalf-rec', 'rodgers-comp'],
+                hedges: [
+                    {
+                        title: "If Pass Game Stalls",
+                        logic: "If LAC can't pass effectively, they pivot to run game. Steelers also grind clock.",
+                        swaps: [
+                            {out: 'johnston-rec', in: 'vidal-rush'},
+                            {out: 'metcalf-rec', in: 'warren-rush'}
+                        ]
+                    },
+                    {
+                        title: "If Steelers Stay Competitive",
+                        logic: "Close game means both teams stay aggressive. Rodgers throws more, Metcalf gets fed.",
+                        swaps: [
+                            {out: 'johnston-rec', in: 'rodgers-pass'},
+                            {out: 'rodgers-comp', in: 'metcalf-catch'}
+                        ]
+                    },
+                    {
+                        title: "If WR2s Don't Deliver",
+                        logic: "Top targets get doubled. TEs and RBs become safety valves.",
+                        swaps: [
+                            {out: 'johnston-rec', in: 'warren-rec'},
+                            {out: 'metcalf-rec', in: 'gadsden-rec'}
+                        ]
+                    }
+                ]
+            },
+            clockControl: {
+                title: "Ground & Pound",
+                subtitle: "Rush-Heavy Battle",
+                icon: "🏃",
+                description: "Low-scoring grinder. Both teams establish the run early. Clock control game.",
+                legs: ['warren-rush', 'vidal-rush', 'rodgers-pass', 'herbert-comp', 'gadsden-rec', 'mcconkey-catch'],
+                hedges: [
+                    {
+                        title: "If Run Defense Holds",
+                        logic: "If neither team can run, game becomes pass-heavy by necessity.",
+                        swaps: [
+                            {out: 'warren-rush', in: 'metcalf-rec'},
+                            {out: 'vidal-rush', in: 'johnston-rec'}
+                        ]
+                    },
+                    {
+                        title: "If One Team Breaks Out",
+                        logic: "One offense finds rhythm through air. Other team forced to abandon run.",
+                        swaps: [
+                            {out: 'gadsden-rec', in: 'herbert-pass'},
+                            {out: 'mcconkey-catch', in: 'rodgers-comp'}
+                        ]
+                    },
+                    {
+                        title: "If Short-Yardage Focus",
+                        logic: "Lots of receptions but fewer yards. Check-down heavy game.",
+                        swaps: [
+                            {out: 'rodgers-pass', in: 'warren-rec'},
+                            {out: 'herbert-comp', in: 'mcconkey-rec'}
+                        ]
+                    }
+                ]
+            },
+            shootout: {
+                title: "High-Scoring Shootout",
+                subtitle: "Both Offenses Pop",
+                icon: "💥",
+                description: "Back-and-forth scoring. Both QBs have career games. 50+ total points.",
+                legs: ['herbert-pass', 'rodgers-pass', 'mcconkey-rec', 'metcalf-rec', 'johnston-rec', 'warren-rec'],
+                hedges: [
+                    {
+                        title: "If One QB Struggles",
+                        logic: "Only one offense pops off. Other team can't keep up.",
+                        swaps: [
+                            {out: 'rodgers-pass', in: 'vidal-rush'},
+                            {out: 'metcalf-rec', in: 'herbert-comp'}
+                        ]
+                    },
+                    {
+                        title: "If Run Game Opens Up",
+                        logic: "Play-action success leads to rushing TDs. Balanced shootout.",
+                        swaps: [
+                            {out: 'johnston-rec', in: 'warren-rush'},
+                            {out: 'warren-rec', in: 'vidal-rush'}
+                        ]
+                    },
+                    {
+                        title: "If Slot/TE Dominate",
+                        logic: "Defenses take away outside, middle gets shredded.",
+                        swaps: [
+                            {out: 'johnston-rec', in: 'mcconkey-catch'},
+                            {out: 'metcalf-rec', in: 'gadsden-rec'}
+                        ]
+                    }
+                ]
+            },
+            underdog: {
+                title: "Upset Special",
+                subtitle: "Underdogs & Value Plays",
+                icon: "⚡",
+                description: "Game doesn't go as expected. Backups shine, favorites underperform.",
+                legs: ['rodgers-pass', 'warren-rush', 'warren-rec', 'gadsden-rec', 'vidal-rush', 'mcconkey-catch'],
+                hedges: [
+                    {
+                        title: "If Steelers Can't Move Ball",
+                        logic: "PIT offense stalls. Chargers control game but don't blow out.",
+                        swaps: [
+                            {out: 'rodgers-pass', in: 'herbert-comp'},
+                            {out: 'warren-rush', in: 'mcconkey-rec'}
+                        ]
+                    },
+                    {
+                        title: "If Chargers Dominate After All",
+                        logic: "Favorites live up to billing. Herbert and top weapons feast.",
+                        swaps: [
+                            {out: 'warren-rush', in: 'herbert-pass'},
+                            {out: 'gadsden-rec', in: 'johnston-rec'}
+                        ]
+                    },
+                    {
+                        title: "If True Defensive Battle",
+                        logic: "Neither offense does much. Only the safest props with huge cushions hit.",
+                        swaps: [
+                            {out: 'rodgers-pass', in: 'rodgers-comp'},
+                            {out: 'warren-rec', in: 'metcalf-catch'}
+                        ]
+                    }
                 ]
             }
         };
         
-        let currentGame = 'pit-lac';
-        let selectedProps = [];
-        let currentFilter = 'all';
+        let selectedScenario = null;
         
         function init() {
-            renderGameTabs();
-            renderProps();
-            updateTimestamp();
-            showSuggestions();
+            renderScenarios();
         }
         
-        function renderGameTabs() {
-            const tabs = document.getElementById('gameTabs');
-            tabs.innerHTML = Object.keys(games).map(key => {
-                const game = games[key];
-                return `<div class="game-tab ${key === currentGame ? 'active' : ''}" onclick="selectGame('${key}')">
-                    <div>${game.name}</div>
-                    <div style="font-size: 0.85em; opacity: 0.8;">${game.time}</div>
-                </div>`;
+        function renderScenarios() {
+            const grid = document.getElementById('scenariosGrid');
+            grid.innerHTML = Object.keys(SCENARIOS).map(key => {
+                const scenario = SCENARIOS[key];
+                const legs = scenario.legs.map(legKey => PROPS[legKey]);
+                const payout = calculatePayout(legs.length);
+                
+                return `
+                    <div class="scenario-card" onclick="selectScenario('${key}')">
+                        <div class="scenario-header">
+                            <div>
+                                <div class="scenario-icon">${scenario.icon}</div>
+                                <div class="scenario-title">${scenario.title}</div>
+                                <div style="opacity:0.7; font-size:0.9em;">${scenario.subtitle}</div>
+                            </div>
+                        </div>
+                        <div class="scenario-desc">${scenario.description}</div>
+                        <div class="scenario-legs">
+                            ${legs.slice(0, 4).map(leg => `
+                                <div class="leg-item">
+                                    ✓ ${leg.player} - ${leg.stat} O${leg.line}
+                                </div>
+                            `).join('')}
+                            <div class="leg-item" style="opacity:0.6;">+ ${legs.length - 4} more...</div>
+                        </div>
+                        <div class="payout-badge">
+                            ${payout.multiplier.toFixed(1)}x • $100 → $${payout.payout.toFixed(0)}
+                        </div>
+                    </div>
+                `;
             }).join('');
         }
         
-        function selectGame(gameKey) {
-            currentGame = gameKey;
-            selectedProps = [];
-            renderGameTabs();
-            renderProps();
-            updateParlay();
-            showSuggestions();
+        function selectScenario(scenarioKey) {
+            selectedScenario = scenarioKey;
+            const scenario = SCENARIOS[scenarioKey];
+            
+            // Update cards
+            document.querySelectorAll('.scenario-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // Show main parlay
+            displayMainParlay(scenario);
+            
+            // Generate and show hedges
+            displayHedges(scenario);
+            
+            // Show hedges section
+            document.getElementById('hedgesSection').classList.add('active');
+            
+            // Smooth scroll
+            setTimeout(() => {
+                document.getElementById('hedgesSection').scrollIntoView({behavior: 'smooth'});
+            }, 100);
         }
         
-        function renderProps() {
-            const game = games[currentGame];
-            const props = game.props.map(prop => ({
-                ...prop,
-                cushion: prop.avg - prop.line,
-                cushionPct: ((prop.avg - prop.line) / prop.line * 100),
-                confidence: getConfidence((prop.avg - prop.line) / prop.line * 100)
-            }));
+        function displayMainParlay(scenario) {
+            document.getElementById('mainScenarioTitle').textContent = scenario.title + ' - Main Parlay';
             
-            const filtered = props.filter(prop => {
-                if (currentFilter === 'all') return true;
-                if (currentFilter === 'suggested') return prop.cushionPct >= 10;
-                if (currentFilter === 'passing') return prop.stat.includes('Pass');
-                if (currentFilter === 'rushing') return prop.stat.includes('Rush');
-                if (currentFilter === 'receiving') return prop.stat.includes('Receiv') || prop.stat === 'Receptions';
-                return true;
-            });
-            
-            document.getElementById('totalProps').textContent = props.length;
-            document.getElementById('suggestedCount').textContent = props.filter(p => p.cushionPct >= 10).length;
-            
-            const grid = document.getElementById('propsGrid');
-            grid.innerHTML = filtered.map(prop => `
-                <div class="prop-card ${isSelected(prop.id) ? 'selected' : ''} ${prop.cushionPct >= 15 ? 'suggested' : ''}" 
-                     onclick="toggleProp(${prop.id})">
-                    <div class="prop-header">
-                        <div>
-                            <div class="player-name">${prop.player} (${prop.team})</div>
-                            <div style="font-size: 0.95em; margin-top: 4px;">${prop.stat} OVER ${prop.line}</div>
+            const legs = scenario.legs.map(legKey => PROPS[legKey]);
+            const legsHtml = legs.map(leg => {
+                const cushion = leg.avg - leg.line;
+                const cushionPct = (cushion / leg.line * 100);
+                const conf = getConfidence(cushionPct);
+                
+                return `
+                    <div class="parlay-leg">
+                        <div class="leg-info">
+                            <strong>${leg.player}</strong> (${leg.team})<br>
+                            <span class="leg-cushion">${leg.stat} O${leg.line} • Avg: ${leg.avg} • +${cushion.toFixed(1)} (${cushionPct.toFixed(1)}%)</span>
                         </div>
-                        <div class="confidence-badge conf-${prop.confidence.toLowerCase().replace(' ', '-')}">${prop.confidence}</div>
+                        <span class="confidence conf-${conf.toLowerCase()}">${conf}</span>
                     </div>
-                    <div class="prop-details">
-                        <div class="prop-stat">
-                            <strong>${prop.avg.toFixed(1)}</strong>
-                            Season Avg
+                `;
+            }).join('');
+            
+            document.getElementById('mainParlayLegs').innerHTML = legsHtml;
+            
+            const payout = calculatePayout(legs.length);
+            document.getElementById('mainLegs').textContent = legs.length;
+            document.getElementById('mainOdds').textContent = payout.american > 0 ? '+' + Math.round(payout.american) : Math.round(payout.american);
+            document.getElementById('mainPayout').textContent = '$' + payout.payout.toFixed(0);
+        }
+        
+        function displayHedges(scenario) {
+            const hedgesHtml = scenario.hedges.map((hedge, idx) => {
+                const hedgeLegs = [...scenario.legs];
+                hedge.swaps.forEach(swap => {
+                    const index = hedgeLegs.indexOf(swap.out);
+                    if (index > -1) hedgeLegs[index] = swap.in;
+                });
+                
+                const legs = hedgeLegs.map(legKey => PROPS[legKey]);
+                const payout = calculatePayout(legs.length);
+                
+                const changesHtml = hedge.swaps.map(swap => {
+                    const outProp = PROPS[swap.out];
+                    const inProp = PROPS[swap.in];
+                    return `
+                        <div class="change-item">
+                            <span class="change-out">✗ ${outProp.player} ${outProp.stat}</span><br>
+                            <span class="change-in">✓ ${inProp.player} ${inProp.stat} O${inProp.line}</span>
                         </div>
-                        <div class="prop-stat">
-                            <strong>+${prop.cushion.toFixed(1)} (${prop.cushionPct.toFixed(1)}%)</strong>
-                            Cushion
+                    `;
+                }).join('');
+                
+                return `
+                    <div class="hedge-card">
+                        <div class="hedge-header">
+                            <div class="hedge-title">🛡️ Hedge ${idx + 1}: ${hedge.title}</div>
+                            <div style="opacity:0.7; font-size:0.9em;">${legs.length} legs • ${payout.multiplier.toFixed(1)}x payout</div>
+                        </div>
+                        
+                        <div class="hedge-logic">
+                            <strong>💡 Why this works:</strong><br>
+                            ${hedge.logic}
+                        </div>
+                        
+                        <div class="changes-list">
+                            <div style="font-weight:600; margin-bottom:10px; opacity:0.8;">Changes from Main:</div>
+                            ${changesHtml}
+                        </div>
+                        
+                        <div class="payout-calc">
+                            <div class="payout-item">
+                                <div class="payout-label">Payout</div>
+                                <div class="payout-value" style="font-size:1.3em;">$${payout.payout.toFixed(0)}</div>
+                            </div>
+                            <div class="payout-item">
+                                <div class="payout-label">ROI</div>
+                                <div class="payout-value" style="font-size:1.3em;">${payout.multiplier.toFixed(1)}x</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
+            
+            document.getElementById('hedgesGrid').innerHTML = hedgesHtml;
         }
         
         function getConfidence(cushionPct) {
-            if (cushionPct >= 30) return 'VERY HIGH';
-            if (cushionPct >= 20) return 'HIGH';
-            if (cushionPct >= 10) return 'MEDIUM';
-            if (cushionPct >= 5) return 'LOW';
-            return 'RISKY';
-        }
-        
-        function isSelected(propId) {
-            return selectedProps.some(p => p.id === propId);
-        }
-        
-        function toggleProp(propId) {
-            const game = games[currentGame];
-            const prop = game.props.find(p => p.id === propId);
-            
-            if (isSelected(propId)) {
-                selectedProps = selectedProps.filter(p => p.id !== propId);
-            } else {
-                selectedProps.push(prop);
-            }
-            
-            renderProps();
-            updateParlay();
-        }
-        
-        function updateParlay() {
-            const legCount = selectedProps.length;
-            document.getElementById('legCount').textContent = legCount;
-            document.getElementById('selectedCount').textContent = legCount;
-            
-            const parlayLegs = document.getElementById('parlayLegs');
-            
-            if (legCount === 0) {
-                parlayLegs.innerHTML = '<div class="empty-state" style="color: rgba(255,255,255,0.7);">Click props to add them here</div>';
-                document.getElementById('payoutCalc').style.display = 'none';
-                document.getElementById('hedges').innerHTML = '';
-                return;
-            }
-            
-            parlayLegs.innerHTML = selectedProps.map(prop => `
-                <div class="parlay-leg">
-                    <div>
-                        <strong>${prop.player}</strong><br>
-                        <span style="font-size: 0.85em;">${prop.stat} O${prop.line}</span>
-                    </div>
-                    <button class="remove-btn" onclick="toggleProp(${prop.id})">×</button>
-                </div>
-            `).join('');
-            
-            // Calculate payout
-            if (legCount > 0) {
-                const payout = calculatePayout(legCount);
-                document.getElementById('payoutCalc').style.display = 'block';
-                document.getElementById('oddsPerLeg').textContent = payout.oddsPerLeg;
-                document.getElementById('combinedOdds').textContent = payout.combinedOdds > 0 ? '+' + Math.round(payout.combinedOdds) : Math.round(payout.combinedOdds);
-                document.getElementById('multiplier').textContent = payout.multiplier.toFixed(2) + 'x';
-                document.getElementById('payout100').textContent = payout.payout.toFixed(2);
-            }
+            if (cushionPct >= 15) return 'HIGH';
+            if (cushionPct >= 8) return 'MEDIUM';
+            return 'LOW';
         }
         
         function calculatePayout(legs, oddsPerLeg = -180) {
@@ -600,109 +725,57 @@
             const american = total >= 2 ? (total - 1) * 100 : -100 / (total - 1);
             
             return {
+                legs: legs,
                 oddsPerLeg: oddsPerLeg,
-                combinedOdds: american,
+                american: american,
                 multiplier: total,
                 payout: total * 100
             };
         }
         
-        function filterProps(filter) {
-            currentFilter = filter;
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            renderProps();
-        }
-        
-        function showSuggestions() {
-            const game = games[currentGame];
-            const suggested = game.props.filter(p => {
-                const cushionPct = ((p.avg - p.line) / p.line * 100);
-                return cushionPct >= 15;
-            }).slice(0, 6);
+        function exportAllParlays() {
+            if (!selectedScenario) return;
             
-            if (suggested.length >= 4) {
-                document.getElementById('suggestions').style.display = 'block';
-                document.getElementById('suggestionText').textContent = 
-                    `Found ${suggested.length} high-confidence props with 15%+ cushion. Add them to build a 6-leg parlay targeting 10x+ payout.`;
-            }
-        }
-        
-        function addSuggestedProps() {
-            const game = games[currentGame];
-            selectedProps = game.props.filter(p => {
-                const cushionPct = ((p.avg - p.line) / p.line * 100);
-                return cushionPct >= 15;
-            }).slice(0, 6);
+            const scenario = SCENARIOS[selectedScenario];
+            let csv = 'Parlay,Leg,Player,Team,Stat Type,Line,Season Avg,Cushion\n';
             
-            renderProps();
-            updateParlay();
-        }
-        
-        function generateHedges() {
-            if (selectedProps.length < 5) {
-                alert('Need at least 5 props to generate hedges!');
-                return;
-            }
-            
-            const sorted = [...selectedProps].sort((a, b) => {
-                const aCushion = ((a.avg - a.line) / a.line * 100);
-                const bCushion = ((b.avg - b.line) / b.line * 100);
-                return aCushion - bCushion;
+            // Main parlay
+            scenario.legs.forEach((legKey, idx) => {
+                const leg = PROPS[legKey];
+                const cushion = leg.avg - leg.line;
+                csv += `Main,${idx + 1},${leg.player},${leg.team},${leg.stat},${leg.line},${leg.avg},${cushion.toFixed(1)}\n`;
             });
             
-            const hedgesDiv = document.getElementById('hedges');
-            hedgesDiv.innerHTML = '<h4 style="margin-bottom: 10px; color: #2a5298;">🛡️ Hedge Versions</h4>';
-            
-            for (let i = 0; i < Math.min(3, sorted.length); i++) {
-                const removed = sorted[i];
-                const hedgeLegs = selectedProps.filter(p => p.id !== removed.id);
-                const payout = calculatePayout(hedgeLegs.length);
+            // Hedges
+            scenario.hedges.forEach((hedge, hedgeIdx) => {
+                const hedgeLegs = [...scenario.legs];
+                hedge.swaps.forEach(swap => {
+                    const index = hedgeLegs.indexOf(swap.out);
+                    if (index > -1) hedgeLegs[index] = swap.in;
+                });
                 
-                hedgesDiv.innerHTML += `
-                    <div style="background: #e9ecef; padding: 15px; border-radius: 10px; margin-bottom: 10px;">
-                        <div style="font-weight: 600; margin-bottom: 8px;">Hedge ${i + 1} (${hedgeLegs.length} legs)</div>
-                        <div style="font-size: 0.85em; color: #6c757d; margin-bottom: 8px;">
-                            Removed: ${removed.player} ${removed.stat}
-                        </div>
-                        <div style="font-weight: 600; color: #28a745;">
-                            ${payout.multiplier.toFixed(2)}x → $100 = $${payout.payout.toFixed(2)}
-                        </div>
-                    </div>
-                `;
-            }
-        }
-        
-        function clearParlay() {
-            selectedProps = [];
-            renderProps();
-            updateParlay();
-        }
-        
-        function exportParlay() {
-            if (selectedProps.length === 0) {
-                alert('Add props to your parlay first!');
-                return;
-            }
-            
-            let csv = 'Player,Team,Stat Type,Line,Season Avg,Cushion\n';
-            selectedProps.forEach(prop => {
-                const cushion = prop.avg - prop.line;
-                csv += `${prop.player},${prop.team},${prop.stat},${prop.line},${prop.avg},${cushion.toFixed(1)}\n`;
+                hedgeLegs.forEach((legKey, idx) => {
+                    const leg = PROPS[legKey];
+                    const cushion = leg.avg - leg.line;
+                    csv += `Hedge ${hedgeIdx + 1},${idx + 1},${leg.player},${leg.team},${leg.stat},${leg.line},${leg.avg},${cushion.toFixed(1)}\n`;
+                });
             });
             
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `nfl_parlay_${Date.now()}.csv`;
+            a.download = `nfl_smart_parlays_${Date.now()}.csv`;
             a.click();
         }
         
-        function updateTimestamp() {
-            const now = new Date();
-            document.getElementById('timestamp').textContent = now.toLocaleString();
-            setTimeout(updateTimestamp, 60000);
+        function resetSelection() {
+            selectedScenario = null;
+            document.getElementById('hedgesSection').classList.remove('active');
+            document.querySelectorAll('.scenario-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            window.scrollTo({top: 0, behavior: 'smooth'});
         }
         
         init();
